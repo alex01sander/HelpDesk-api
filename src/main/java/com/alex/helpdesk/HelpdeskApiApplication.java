@@ -10,4 +10,5 @@ public class HelpdeskApiApplication {
 		SpringApplication.run(HelpdeskApiApplication.class, args);
 	}
 
+
 }

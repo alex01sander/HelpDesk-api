@@ -1,5 +1,6 @@
 package com.alex.helpdesk.model;
 
+import com.alex.helpdesk.dto.UsuarioRequestDTO;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +18,12 @@ public class Usuario {
 
     public Usuario() {
     }
+
+    public Usuario(UsuarioRequestDTO dto) {
+        this.nome = dto.nome();
+        this.email = dto.email();
+    }
+
 
     public Long getId() {
         return id;
