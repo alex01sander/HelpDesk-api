@@ -6,6 +6,8 @@ import com.alex.helpdesk.model.Usuario;
 import com.alex.helpdesk.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UsuarioService {
 
@@ -16,15 +18,23 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO cadastrarUsuario(UsuarioRequestDTO dto) {
-
         Usuario usuario = new Usuario(dto);
-
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
+        return converterParaDTO(usuarioSalvo);
+    }
 
+    public List<UsuarioResponseDTO> listarUsuarios() {
+        return usuarioRepository.findAll()
+                .stream()
+                .map(this::converterParaDTO)
+                .toList();
+    }
+
+    private UsuarioResponseDTO converterParaDTO(Usuario usuario) {
         return new UsuarioResponseDTO(
-                usuarioSalvo.getId(),
-                usuarioSalvo.getNome(),
-                usuarioSalvo.getEmail()
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail()
         );
     }
 }
