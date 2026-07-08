@@ -29,6 +29,12 @@ public class UsuarioService {
                 .map(this::converterParaDTO)
                 .toList();
     }
+    public UsuarioResponseDTO buscarPorId(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o id: " + id));
+
+        return converterParaDTO(usuario);
+    }
 
     private UsuarioResponseDTO converterParaDTO(Usuario usuario) {
         return new UsuarioResponseDTO(

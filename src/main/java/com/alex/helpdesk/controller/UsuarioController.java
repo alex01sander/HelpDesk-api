@@ -27,4 +27,9 @@ public class UsuarioController {
     public List<UsuarioResponseDTO> listarUsuarios() {
         return usuarioService.listarUsuarios();
     }
+
+    @GetMapping("/{id}")
+    public UsuarioResponseDTO buscarPorId(@PathVariable Long id) {
+        return usuarioService.buscarPorId(id);
+    }
 }
