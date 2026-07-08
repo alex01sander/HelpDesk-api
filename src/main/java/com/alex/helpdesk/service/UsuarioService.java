@@ -2,6 +2,7 @@ package com.alex.helpdesk.service;
 
 import com.alex.helpdesk.dto.UsuarioRequestDTO;
 import com.alex.helpdesk.dto.UsuarioResponseDTO;
+import com.alex.helpdesk.exception.UsuarioNaoEncontradoException;
 import com.alex.helpdesk.model.Usuario;
 import com.alex.helpdesk.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class UsuarioService {
     }
     public UsuarioResponseDTO buscarPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o id: " + id));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
 
         return converterParaDTO(usuario);
     }
