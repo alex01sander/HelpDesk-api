@@ -37,6 +37,18 @@ public class UsuarioService {
         return converterParaDTO(usuario);
     }
 
+    public UsuarioResponseDTO atualizarUsuario(Long id, UsuarioRequestDTO dto) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+
+        usuario.setNome(dto.nome());
+        usuario.setEmail(dto.email());
+
+        Usuario usuarioAtualizado = usuarioRepository.save(usuario);
+
+        return converterParaDTO(usuarioAtualizado);
+    }
+
     private UsuarioResponseDTO converterParaDTO(Usuario usuario) {
         return new UsuarioResponseDTO(
                 usuario.getId(),
