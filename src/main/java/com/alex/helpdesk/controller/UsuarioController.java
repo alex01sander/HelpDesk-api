@@ -4,6 +4,7 @@ import com.alex.helpdesk.dto.UsuarioRequestDTO;
 import com.alex.helpdesk.dto.UsuarioResponseDTO;
 import com.alex.helpdesk.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,5 +37,11 @@ public class UsuarioController {
     @PutMapping("/{id}")
     public UsuarioResponseDTO atualizarUsuario(@PathVariable Long id, @RequestBody @Valid UsuarioRequestDTO dto) {
         return usuarioService.atualizarUsuario(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirUsuario(@PathVariable Long id) {
+        usuarioService.excluirUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 }
