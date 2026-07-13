@@ -49,6 +49,13 @@ public class UsuarioService {
         return converterParaDTO(usuarioAtualizado);
     }
 
+    public void excluirUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+
+        usuarioRepository.delete(usuario);
+    }
+
     private UsuarioResponseDTO converterParaDTO(Usuario usuario) {
         return new UsuarioResponseDTO(
                 usuario.getId(),
