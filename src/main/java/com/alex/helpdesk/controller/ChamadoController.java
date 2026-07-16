@@ -27,4 +27,9 @@ public class ChamadoController {
     public List<ChamadoResponseDTO> listarChamados() {
         return chamadoService.listarChamados();
     }
+
+    @GetMapping("/{id}")
+    public ChamadoResponseDTO buscarPorId(@PathVariable Long id) {
+        return chamadoService.buscarPorId(id);
+    }
 }

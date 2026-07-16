@@ -4,6 +4,7 @@ import com.alex.helpdesk.dto.ChamadoRequestDTO;
 import com.alex.helpdesk.dto.ChamadoResponseDTO;
 import com.alex.helpdesk.dto.TecnicoResponseDTO;
 import com.alex.helpdesk.dto.UsuarioResponseDTO;
+import com.alex.helpdesk.exception.ChamadoNaoEncontradoException;
 import com.alex.helpdesk.exception.UsuarioNaoEncontradoException;
 import com.alex.helpdesk.model.Chamado;
 import com.alex.helpdesk.model.Tecnico;
@@ -76,4 +77,12 @@ public class ChamadoService {
                 tecnicoDTO
         );
     }
+
+    public ChamadoResponseDTO buscarPorId(Long id) {
+        Chamado chamado = chamadoRepository.findById(id)
+                .orElseThrow(() -> new ChamadoNaoEncontradoException(id));
+
+        return converterParaDTO(chamado);
+    }
+
 }
