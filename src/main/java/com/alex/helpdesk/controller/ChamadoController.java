@@ -1,5 +1,6 @@
 package com.alex.helpdesk.controller;
 
+import com.alex.helpdesk.dto.AtribuirTecnicoRequestDTO;
 import com.alex.helpdesk.dto.ChamadoRequestDTO;
 import com.alex.helpdesk.dto.ChamadoResponseDTO;
 import com.alex.helpdesk.service.ChamadoService;
@@ -31,5 +32,10 @@ public class ChamadoController {
     @GetMapping("/{id}")
     public ChamadoResponseDTO buscarPorId(@PathVariable Long id) {
         return chamadoService.buscarPorId(id);
+    }
+
+    @PatchMapping("/{id}/atribuir-tecnico")
+    public ChamadoResponseDTO atribuirTecnico(@PathVariable Long id, @RequestBody @Valid AtribuirTecnicoRequestDTO dto) {
+        return chamadoService.atribuirTecnico(id, dto);
     }
 }

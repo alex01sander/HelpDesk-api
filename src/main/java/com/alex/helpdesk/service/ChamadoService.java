@@ -1,15 +1,15 @@
 package com.alex.helpdesk.service;
 
-import com.alex.helpdesk.dto.ChamadoRequestDTO;
-import com.alex.helpdesk.dto.ChamadoResponseDTO;
-import com.alex.helpdesk.dto.TecnicoResponseDTO;
-import com.alex.helpdesk.dto.UsuarioResponseDTO;
+import com.alex.helpdesk.dto.*;
 import com.alex.helpdesk.exception.ChamadoNaoEncontradoException;
+import com.alex.helpdesk.exception.TecnicoNaoEncontradoException;
 import com.alex.helpdesk.exception.UsuarioNaoEncontradoException;
 import com.alex.helpdesk.model.Chamado;
+import com.alex.helpdesk.model.StatusChamado;
 import com.alex.helpdesk.model.Tecnico;
 import com.alex.helpdesk.model.Usuario;
 import com.alex.helpdesk.repository.ChamadoRepository;
+import com.alex.helpdesk.repository.TecnicoRepository;
 import com.alex.helpdesk.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +20,13 @@ public class ChamadoService {
 
     private final ChamadoRepository chamadoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final TecnicoRepository tecnicoRepository;
 
-    public ChamadoService(ChamadoRepository chamadoRepository, UsuarioRepository usuarioRepository) {
+
+    public ChamadoService(ChamadoRepository chamadoRepository, UsuarioRepository usuarioRepository, TecnicoRepository tecnicoRepository ) {
         this.chamadoRepository = chamadoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.tecnicoRepository = tecnicoRepository;
     }
 
     public ChamadoResponseDTO abrirChamado(ChamadoRequestDTO dto) {
@@ -85,4 +88,18 @@ public class ChamadoService {
         return converterParaDTO(chamado);
     }
 
+    public ChamadoResponseDTO atribuirTecnico(Long chamadoId, AtribuirTecnicoRequestDTO dto) {
+        Chamado chamado = chamadoRepository.findById(chamadoId)
+                .orElseThrow(() -> new ChamadoNaoEncontradoException(chamadoId));
+
+        Tecnico tecnico = tecnicoRepository.findById(dto.tecnicoId())
+                .orElseThrow(() -> new TecnicoNaoEncontradoException(dto.tecnicoId()));
+
+        chamado.setTecnico(tecnico);
+        chamado.setStatus(StatusChamado.EM_ANDAMENTO);
+
+        Chamado chamadoAtualizado = chamadoRepository.save(chamado);
+
+        return converterParaDTO(chamadoAtualizado);
+    }
 }
