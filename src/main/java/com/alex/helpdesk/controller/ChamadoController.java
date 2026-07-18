@@ -1,6 +1,7 @@
 package com.alex.helpdesk.controller;
 
 import com.alex.helpdesk.dto.AtribuirTecnicoRequestDTO;
+import com.alex.helpdesk.dto.AtualizarStatusRequestDTO;
 import com.alex.helpdesk.dto.ChamadoRequestDTO;
 import com.alex.helpdesk.dto.ChamadoResponseDTO;
 import com.alex.helpdesk.service.ChamadoService;
@@ -37,5 +38,10 @@ public class ChamadoController {
     @PatchMapping("/{id}/atribuir-tecnico")
     public ChamadoResponseDTO atribuirTecnico(@PathVariable Long id, @RequestBody @Valid AtribuirTecnicoRequestDTO dto) {
         return chamadoService.atribuirTecnico(id, dto);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ChamadoResponseDTO atualizarStatus(@PathVariable Long id, @RequestBody @Valid AtualizarStatusRequestDTO dto) {
+        return chamadoService.atualizarStatus(id, dto);
     }
 }

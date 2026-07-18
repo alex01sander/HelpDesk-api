@@ -102,4 +102,15 @@ public class ChamadoService {
 
         return converterParaDTO(chamadoAtualizado);
     }
+
+    public ChamadoResponseDTO atualizarStatus(Long chamadoId, AtualizarStatusRequestDTO dto) {
+        Chamado chamado = chamadoRepository.findById(chamadoId)
+                .orElseThrow(() -> new ChamadoNaoEncontradoException(chamadoId));
+
+        chamado.setStatus(dto.status());
+
+        Chamado chamadoAtualizado = chamadoRepository.save(chamado);
+
+        return converterParaDTO(chamadoAtualizado);
+    }
 }
