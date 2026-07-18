@@ -55,4 +55,19 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }
+
+    @ExceptionHandler(AutorComentarioInvalidoException.class)
+    public ResponseEntity<ErroResposta> tratarAutorComentarioInvalido(
+            AutorComentarioInvalidoException ex, HttpServletRequest request) {
+
+        ErroResposta erro = new ErroResposta(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Autor do comentário inválido",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
 }
