@@ -70,4 +70,19 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
+
+    @ExceptionHandler(TecnicoPossuiVinculosException.class)
+    public ResponseEntity<ErroResposta> tratarTecnicoPossuiVinculos(
+            TecnicoPossuiVinculosException ex, HttpServletRequest request) {
+
+        ErroResposta erro = new ErroResposta(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Técnico possui vínculos",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
+    }
 }
