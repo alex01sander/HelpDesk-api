@@ -79,4 +79,34 @@ class UsuarioServiceTest {
         assertEquals("Alex Sander Britto", resultado.nome());
         assertEquals("alexnovo@email.com", resultado.email());
     }
+
+    @Test
+    void deveExcluirUsuarioComSucesso() {
+        // Arrange
+        Long id = 1L;
+        Usuario usuarioExistente = new Usuario();
+        usuarioExistente.setId(id);
+        usuarioExistente.setNome("Alex Britto");
+        usuarioExistente.setEmail("alex@email.com");
+
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuarioExistente));
+
+
+        usuarioService.excluirUsuario(id);
+
+
+        org.mockito.Mockito.verify(usuarioRepository, org.mockito.Mockito.times(1)).delete(usuarioExistente);
+    }
+
+    @Test
+    void deveLancarExcecaoAoExcluirUsuarioInexistente() {
+        // Arrange
+        Long idInexistente = 999L;
+        when(usuarioRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        // Act + Assert
+        assertThrows(UsuarioNaoEncontradoException.class, () -> {
+            usuarioService.excluirUsuario(idInexistente);
+        });
+    }
 }
