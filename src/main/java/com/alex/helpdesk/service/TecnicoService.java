@@ -8,6 +8,7 @@ import com.alex.helpdesk.model.Tecnico;
 import com.alex.helpdesk.repository.ChamadoRepository;
 import com.alex.helpdesk.repository.ComentarioRepository;
 import com.alex.helpdesk.repository.TecnicoRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,17 +19,21 @@ public class TecnicoService {
     private final TecnicoRepository tecnicoRepository;
     private final ChamadoRepository chamadoRepository;
     private final ComentarioRepository comentarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public TecnicoService(TecnicoRepository tecnicoRepository,
                           ChamadoRepository chamadoRepository,
-                          ComentarioRepository comentarioRepository) {
+                          ComentarioRepository comentarioRepository,
+                          PasswordEncoder passwordEncoder) {
         this.tecnicoRepository = tecnicoRepository;
         this.chamadoRepository = chamadoRepository;
         this.comentarioRepository = comentarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public TecnicoResponseDTO cadastrarTecnico(TecnicoRequestDTO dto) {
         Tecnico tecnico = new Tecnico(dto);
+        tecnico.setSenha(passwordEncoder.encode(dto.senha()));
         Tecnico tecnicoSalvo = tecnicoRepository.save(tecnico);
         return converterParaDTO(tecnicoSalvo);
     }
@@ -53,6 +58,7 @@ public class TecnicoService {
 
         tecnico.setNome(dto.nome());
         tecnico.setEmail(dto.email());
+        tecnico.setSenha(passwordEncoder.encode(dto.senha()));
         tecnico.setEspecialidade(dto.especialidade());
 
         Tecnico tecnicoAtualizado = tecnicoRepository.save(tecnico);

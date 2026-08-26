@@ -5,6 +5,7 @@ import com.alex.helpdesk.dto.UsuarioResponseDTO;
 import com.alex.helpdesk.exception.UsuarioNaoEncontradoException;
 import com.alex.helpdesk.model.Usuario;
 import com.alex.helpdesk.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,13 +14,16 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UsuarioResponseDTO cadastrarUsuario(UsuarioRequestDTO dto) {
         Usuario usuario = new Usuario(dto);
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
         return converterParaDTO(usuarioSalvo);
     }
@@ -43,6 +47,7 @@ public class UsuarioService {
 
         usuario.setNome(dto.nome());
         usuario.setEmail(dto.email());
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
 
         Usuario usuarioAtualizado = usuarioRepository.save(usuario);
 

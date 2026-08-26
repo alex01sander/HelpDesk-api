@@ -11,6 +11,7 @@ import com.alex.helpdesk.model.Usuario;
 import com.alex.helpdesk.repository.ChamadoRepository;
 import com.alex.helpdesk.repository.TecnicoRepository;
 import com.alex.helpdesk.repository.UsuarioRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,8 +31,10 @@ public class ChamadoService {
     }
 
     public ChamadoResponseDTO abrirChamado(ChamadoRequestDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-                .orElseThrow(() -> new UsuarioNaoEncontradoException(dto.usuarioId()));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(email));
 
         Chamado chamado = new Chamado(
                 dto.titulo(),

@@ -12,9 +12,6 @@ public record ChamadoRequestDTO(
         String descricao,
 
         @NotNull
-        Prioridade prioridade,
-
-        @NotNull
-        Long usuarioId
+        Prioridade prioridade
 ) {
 }
