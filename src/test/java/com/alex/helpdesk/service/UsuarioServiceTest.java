@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -23,13 +24,16 @@ class UsuarioServiceTest {
     @Mock
     private UsuarioRepository usuarioRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UsuarioService usuarioService;
 
     @Test
     void deveCadastrarUsuarioComSucesso() {
         // Arrange
-        UsuarioRequestDTO dto = new UsuarioRequestDTO("Alex Britto", "alex@email.com");
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Alex Britto", "alex@email.com", "senha123");
         Usuario usuarioSalvo = new Usuario(dto);
         usuarioSalvo.setId(1L);
 
@@ -47,21 +51,15 @@ class UsuarioServiceTest {
 
     @Test
     void deveLancarExcecaoQuandoUsuarioNaoExiste() {
-        // Arrange
         Long idInexistente = 999L;
         when(usuarioRepository.findById(idInexistente)).thenReturn(Optional.empty());
-
-        // Act + Assert
-        assertThrows(UsuarioNaoEncontradoException.class, () -> {
-            usuarioService.buscarPorId(idInexistente);
-        });
+        assertThrows(UsuarioNaoEncontradoException.class, () -> usuarioService.buscarPorId(idInexistente));
     }
 
     @Test
     void deveAtualizarUsuarioComSucesso() {
-        // Arrange
         Long id = 1L;
-        UsuarioRequestDTO dto = new UsuarioRequestDTO("Alex Sander Britto", "alexnovo@email.com");
+        UsuarioRequestDTO dto = new UsuarioRequestDTO("Alex Sander Britto", "alexnovo@email.com", "senha123");
 
         Usuario usuarioExistente = new Usuario();
         usuarioExistente.setId(id);
@@ -72,17 +70,14 @@ class UsuarioServiceTest {
         when(usuarioRepository.save(org.mockito.ArgumentMatchers.any(Usuario.class)))
                 .thenReturn(usuarioExistente);
 
-        // Act
         UsuarioResponseDTO resultado = usuarioService.atualizarUsuario(id, dto);
 
-        // Assert
         assertEquals("Alex Sander Britto", resultado.nome());
         assertEquals("alexnovo@email.com", resultado.email());
     }
 
     @Test
     void deveExcluirUsuarioComSucesso() {
-        // Arrange
         Long id = 1L;
         Usuario usuarioExistente = new Usuario();
         usuarioExistente.setId(id);
@@ -100,13 +95,8 @@ class UsuarioServiceTest {
 
     @Test
     void deveLancarExcecaoAoExcluirUsuarioInexistente() {
-        // Arrange
         Long idInexistente = 999L;
         when(usuarioRepository.findById(idInexistente)).thenReturn(Optional.empty());
-
-        // Act + Assert
-        assertThrows(UsuarioNaoEncontradoException.class, () -> {
-            usuarioService.excluirUsuario(idInexistente);
-        });
+        assertThrows(UsuarioNaoEncontradoException.class, () -> usuarioService.excluirUsuario(idInexistente));
     }
 }

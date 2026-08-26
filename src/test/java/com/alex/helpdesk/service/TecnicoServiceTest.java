@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -34,13 +35,16 @@ class TecnicoServiceTest {
     @Mock
     private ComentarioRepository comentarioRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private TecnicoService tecnicoService;
 
     @Test
     void deveCadastrarTecnicoComSucesso() {
 
-        TecnicoRequestDTO dto = new TecnicoRequestDTO("Alex Britto", "alex@helpdesk.com", Especialidade.HARDWARE);
+        TecnicoRequestDTO dto = new TecnicoRequestDTO("Alex Britto", "alex@helpdesk.com", "senha123", Especialidade.HARDWARE);
         Tecnico tecnicoSalvo = new Tecnico(dto);
         tecnicoSalvo.setId(1L);
 
@@ -90,7 +94,7 @@ class TecnicoServiceTest {
     void deveAtualizarTecnicoComSucesso() {
 
         Long id = 1L;
-        TecnicoRequestDTO dto = new TecnicoRequestDTO("Alex Sander Britto", "alexnovo@helpdesk.com", Especialidade.REDE);
+        TecnicoRequestDTO dto = new TecnicoRequestDTO("Alex Sander Britto", "alexnovo@helpdesk.com", "senha123", Especialidade.REDE);
 
         Tecnico tecnicoExistente = new Tecnico();
         tecnicoExistente.setId(id);

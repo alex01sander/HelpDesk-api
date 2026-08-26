@@ -16,9 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,12 +62,18 @@ class ChamadoServiceTest {
     void deveAbrirChamadoComSucesso() {
 
         Usuario usuario = criarUsuario();
-        ChamadoRequestDTO dto = new ChamadoRequestDTO("Impressora não funciona", "Descrição do problema", Prioridade.ALTA, usuario.getId());
+        ChamadoRequestDTO dto = new ChamadoRequestDTO("Impressora não funciona", "Descrição do problema", Prioridade.ALTA);
 
         Chamado chamadoSalvo = new Chamado(dto.titulo(), dto.descricao(), dto.prioridade(), usuario);
         chamadoSalvo.setId(1L);
 
-        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(usuario.getEmail());
+        SecurityContextHolder.setContext(securityContext);
+
+        when(usuarioRepository.findByEmail(usuario.getEmail())).thenReturn(Optional.of(usuario));
         when(chamadoRepository.save(any(Chamado.class))).thenReturn(chamadoSalvo);
 
 
@@ -77,10 +88,16 @@ class ChamadoServiceTest {
     @Test
     void deveLancarExcecaoAoAbrirChamadoComUsuarioInexistente() {
 
-        Long usuarioIdInexistente = 999L;
-        ChamadoRequestDTO dto = new ChamadoRequestDTO("Título", "Descrição", Prioridade.BAIXA, usuarioIdInexistente);
+        String emailInexistente = "inexistente@email.com";
+        ChamadoRequestDTO dto = new ChamadoRequestDTO("Título", "Descrição", Prioridade.BAIXA);
 
-        when(usuarioRepository.findById(usuarioIdInexistente)).thenReturn(Optional.empty());
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(emailInexistente);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(usuarioRepository.findByEmail(emailInexistente)).thenReturn(Optional.empty());
 
 
         assertThrows(UsuarioNaoEncontradoException.class, () -> {
