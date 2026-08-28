@@ -39,6 +39,8 @@ src/main/java/com/alex/helpdesk/
 
 ### Variáveis de Ambiente
 
+Um arquivo `.env.example` está disponível na raiz do projeto como template.
+
 | Variável | Descrição | Exemplo |
 |---|---|---|
 | `DB_HOST` | Host e porta do PostgreSQL | `localhost:5432` |
@@ -189,10 +191,15 @@ O token expira em **24 horas** (86400000 ms).
 | Método | Rota | Descrição | Permissão |
 |---|---|---|---|
 | `POST` | `/chamados` | Abre um novo chamado | `USUARIO` |
-| `GET` | `/chamados` | Lista todos os chamados | Autenticado |
+| `GET` | `/chamados` | Lista todos os chamados (com paginação) | Autenticado |
 | `GET` | `/chamados/{id}` | Busca chamado por ID | Autenticado |
 | `PATCH` | `/chamados/{id}/atribuir-tecnico` | Atribui técnico ao chamado | `TECNICO` |
 | `PATCH` | `/chamados/{id}/status` | Atualiza status do chamado | `TECNICO` |
+
+**Paginação:**
+```bash
+GET /chamados?page=0&size=10&sort=prioridade,desc
+```
 
 **Body (abrir chamado):**
 ```json
@@ -218,11 +225,11 @@ O token expira em **24 horas** (86400000 ms).
 **Body:**
 ```json
 {
-  "texto": "Verificamos o problema, peça pedida.",
-  "autorId": 1,
-  "tipoAutor": "TECNICO"
+  "texto": "Verificamos o problema, peça pedida."
 }
 ```
+
+> **Nota:** O autor do comentário é determinado automaticamente pelo token JWT do usuário autenticado (usuário ou técnico).
 
 ---
 
@@ -246,14 +253,60 @@ Tecnico ──┘
 mvn test
 ```
 
-**Cobertura atual:** 28 testes unitários — 0 falhas.
+**Cobertura atual:** 26 testes unitários — 0 falhas.
 
 | Suite | Testes |
 |---|---|
 | `ChamadoServiceTest` | 9 |
-| `ComentarioServiceTest` | 7 |
+| `ComentarioServiceTest` | 5 |
 | `TecnicoServiceTest` | 7 |
 | `UsuarioServiceTest` | 5 |
+
+---
+
+## 🔄 CI/CD
+
+O projeto possui um workflow de CI/CD configurado com GitHub Actions que é executado automaticamente em cada push e pull request para as branches `main` e `develop`.
+
+**O workflow inclui:**
+- Build com Maven
+- Execução de testes unitários
+- Testes de integração com PostgreSQL
+- Upload de resultados dos testes
+
+**Para verificar o status dos builds, acesse a aba "Actions" no repositório GitHub.**
+
+---
+
+## ✨ Recursos de Produção
+
+A API foi desenvolvida com padrões de produção-ready para 2026:
+
+### 🔒 Segurança
+- **Autenticação JWT Bearer** com validação de claims
+- **Autorização baseada em roles** (USUARIO, TECNICO)
+- **Autenticação automática** em comentários (via SecurityContext)
+- **Segurança de comentários:** autor determinado pelo token, não pelo body
+
+### 📊 Auditoria
+- **Timestamps automáticos** em todas as entidades (createdAt, updatedAt)
+- **Tracing de operações** com auditoria de data
+
+### ⚡ Performance
+- **Paginação nativa** em endpoints de listagem
+- **Transações otimizadas** com @Transactional
+- **Validações eficientes** com Bean Validation
+
+### 🛡️ Tratamento de Erros
+- **Validação detalhada** com erros por campo
+- **Respostas padronizadas** via GlobalExceptionHandler
+- **Exceções customizadas** para casos de negócio
+
+### 🚀 DevOps
+- **CI/CD automatizado** com GitHub Actions
+- **Configuração ambiente** com .env.example
+- **Docker Compose** para desenvolvimento local
+- **Health checks** no banco de dados
 
 ---
 
