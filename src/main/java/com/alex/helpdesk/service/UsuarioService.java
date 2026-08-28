@@ -7,6 +7,7 @@ import com.alex.helpdesk.model.Usuario;
 import com.alex.helpdesk.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public UsuarioResponseDTO cadastrarUsuario(UsuarioRequestDTO dto) {
         Usuario usuario = new Usuario(dto);
         usuario.setSenha(passwordEncoder.encode(dto.senha()));
@@ -41,6 +43,7 @@ public class UsuarioService {
         return converterParaDTO(usuario);
     }
 
+    @Transactional
     public UsuarioResponseDTO atualizarUsuario(Long id, UsuarioRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
@@ -54,6 +57,7 @@ public class UsuarioService {
         return converterParaDTO(usuarioAtualizado);
     }
 
+    @Transactional
     public void excluirUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));

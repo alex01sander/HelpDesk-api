@@ -1,6 +1,10 @@
 package com.alex.helpdesk.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "chamados")
@@ -9,6 +13,14 @@ public class Chamado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     private String titulo;
 
@@ -25,7 +37,7 @@ public class Chamado {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "tecnico_id", nullable = true)
+    @JoinColumn(name = "tecnico_id")
     private Tecnico tecnico;
 
     public Chamado() {
@@ -46,6 +58,22 @@ public class Chamado {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getTitulo() {

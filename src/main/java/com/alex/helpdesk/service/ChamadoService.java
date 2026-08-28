@@ -11,10 +11,11 @@ import com.alex.helpdesk.model.Usuario;
 import com.alex.helpdesk.repository.ChamadoRepository;
 import com.alex.helpdesk.repository.TecnicoRepository;
 import com.alex.helpdesk.repository.UsuarioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ChamadoService {
@@ -30,6 +31,7 @@ public class ChamadoService {
         this.tecnicoRepository = tecnicoRepository;
     }
 
+    @Transactional
     public ChamadoResponseDTO abrirChamado(ChamadoRequestDTO dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -48,11 +50,9 @@ public class ChamadoService {
         return converterParaDTO(chamadoSalvo);
     }
 
-    public List<ChamadoResponseDTO> listarChamados() {
-        return chamadoRepository.findAll()
-                .stream()
-                .map(this::converterParaDTO)
-                .toList();
+    public Page<ChamadoResponseDTO> listarChamados(Pageable pageable) {
+        return chamadoRepository.findAll(pageable)
+                .map(this::converterParaDTO);
     }
 
     private ChamadoResponseDTO converterParaDTO(Chamado chamado) {
@@ -91,6 +91,7 @@ public class ChamadoService {
         return converterParaDTO(chamado);
     }
 
+    @Transactional
     public ChamadoResponseDTO atribuirTecnico(Long chamadoId, AtribuirTecnicoRequestDTO dto) {
         Chamado chamado = chamadoRepository.findById(chamadoId)
                 .orElseThrow(() -> new ChamadoNaoEncontradoException(chamadoId));
@@ -106,6 +107,7 @@ public class ChamadoService {
         return converterParaDTO(chamadoAtualizado);
     }
 
+    @Transactional
     public ChamadoResponseDTO atualizarStatus(Long chamadoId, AtualizarStatusRequestDTO dto) {
         Chamado chamado = chamadoRepository.findById(chamadoId)
                 .orElseThrow(() -> new ChamadoNaoEncontradoException(chamadoId));

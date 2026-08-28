@@ -2,7 +2,6 @@ package com.alex.helpdesk.service;
 
 import com.alex.helpdesk.dto.ComentarioRequestDTO;
 import com.alex.helpdesk.dto.ComentarioResponseDTO;
-import com.alex.helpdesk.exception.AutorComentarioInvalidoException;
 import com.alex.helpdesk.exception.ChamadoNaoEncontradoException;
 import com.alex.helpdesk.model.*;
 import com.alex.helpdesk.repository.ChamadoRepository;
@@ -14,13 +13,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ComentarioServiceTest {
@@ -37,6 +40,12 @@ class ComentarioServiceTest {
     @Mock
     private TecnicoRepository tecnicoRepository;
 
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
+
     @InjectMocks
     private ComentarioService comentarioService;
 
@@ -45,6 +54,7 @@ class ComentarioServiceTest {
         usuario.setId(1L);
         usuario.setNome("Alex Sander Britto");
         usuario.setEmail("alexsander@email.com.br");
+        usuario.setRole(Role.USUARIO);
         return usuario;
     }
 
@@ -54,6 +64,7 @@ class ComentarioServiceTest {
         tecnico.setNome("Alex Britto");
         tecnico.setEmail("alex@helpdesk.com");
         tecnico.setEspecialidade(Especialidade.HARDWARE);
+        tecnico.setRole(Role.TECNICO);
         return tecnico;
     }
 
@@ -68,13 +79,18 @@ class ComentarioServiceTest {
         // Arrange
         Usuario usuario = criarUsuario();
         Chamado chamado = criarChamado(usuario);
-        ComentarioRequestDTO dto = new ComentarioRequestDTO("Já testei, ainda não funciona", usuario.getId(), null);
+        ComentarioRequestDTO dto = new ComentarioRequestDTO("Já testei, ainda não funciona");
 
         Comentario comentarioSalvo = new Comentario(dto.texto(), chamado, usuario, null);
 
         when(chamadoRepository.findById(chamado.getId())).thenReturn(Optional.of(chamado));
-        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findByEmail(usuario.getEmail())).thenReturn(Optional.of(usuario));
         when(comentarioRepository.save(any(Comentario.class))).thenReturn(comentarioSalvo);
+
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(usuario.getEmail());
+        when(authentication.getAuthorities()).thenReturn((List) List.of(new SimpleGrantedAuthority("ROLE_USUARIO")));
 
         // Act
         ComentarioResponseDTO resultado = comentarioService.adicionarComentario(chamado.getId(), dto);
@@ -90,13 +106,18 @@ class ComentarioServiceTest {
         Usuario usuario = criarUsuario();
         Tecnico tecnico = criarTecnico();
         Chamado chamado = criarChamado(usuario);
-        ComentarioRequestDTO dto = new ComentarioRequestDTO("Verificando o problema", null, tecnico.getId());
+        ComentarioRequestDTO dto = new ComentarioRequestDTO("Verificando o problema");
 
         Comentario comentarioSalvo = new Comentario(dto.texto(), chamado, null, tecnico);
 
         when(chamadoRepository.findById(chamado.getId())).thenReturn(Optional.of(chamado));
-        when(tecnicoRepository.findById(tecnico.getId())).thenReturn(Optional.of(tecnico));
+        when(tecnicoRepository.findByEmail(tecnico.getEmail())).thenReturn(Optional.of(tecnico));
         when(comentarioRepository.save(any(Comentario.class))).thenReturn(comentarioSalvo);
+
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(tecnico.getEmail());
+        when(authentication.getAuthorities()).thenReturn((List) List.of(new SimpleGrantedAuthority("ROLE_TECNICO")));
 
         // Act
         ComentarioResponseDTO resultado = comentarioService.adicionarComentario(chamado.getId(), dto);
@@ -107,40 +128,10 @@ class ComentarioServiceTest {
     }
 
     @Test
-    void deveLancarExcecaoQuandoAutorTemUsuarioETecnico() {
-        // Arrange
-        Usuario usuario = criarUsuario();
-        Chamado chamado = criarChamado(usuario);
-        ComentarioRequestDTO dto = new ComentarioRequestDTO("Texto", 1L, 1L);
-
-        when(chamadoRepository.findById(chamado.getId())).thenReturn(Optional.of(chamado));
-
-        // Act + Assert
-        assertThrows(AutorComentarioInvalidoException.class, () -> {
-            comentarioService.adicionarComentario(chamado.getId(), dto);
-        });
-    }
-
-    @Test
-    void deveLancarExcecaoQuandoAutorNaoTemUsuarioNemTecnico() {
-        // Arrange
-        Usuario usuario = criarUsuario();
-        Chamado chamado = criarChamado(usuario);
-        ComentarioRequestDTO dto = new ComentarioRequestDTO("Texto", null, null);
-
-        when(chamadoRepository.findById(chamado.getId())).thenReturn(Optional.of(chamado));
-
-        // Act + Assert
-        assertThrows(AutorComentarioInvalidoException.class, () -> {
-            comentarioService.adicionarComentario(chamado.getId(), dto);
-        });
-    }
-
-    @Test
     void deveLancarExcecaoAoComentarEmChamadoInexistente() {
         // Arrange
         Long chamadoIdInexistente = 999L;
-        ComentarioRequestDTO dto = new ComentarioRequestDTO("Texto", 1L, null);
+        ComentarioRequestDTO dto = new ComentarioRequestDTO("Texto");
 
         when(chamadoRepository.findById(chamadoIdInexistente)).thenReturn(Optional.empty());
 

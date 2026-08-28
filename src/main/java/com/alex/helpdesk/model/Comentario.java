@@ -1,6 +1,8 @@
 package com.alex.helpdesk.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -15,18 +17,24 @@ public class Comentario {
     @Column(columnDefinition = "TEXT")
     private String texto;
 
-    private LocalDateTime dataCriacao;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "chamado_id", nullable = false)
     private Chamado chamado;
 
     @ManyToOne
-    @JoinColumn(name = "autor_usuario_id", nullable = true)
+    @JoinColumn(name = "autor_usuario_id")
     private Usuario autorUsuario;
 
     @ManyToOne
-    @JoinColumn(name = "autor_tecnico_id", nullable = true)
+    @JoinColumn(name = "autor_tecnico_id")
     private Tecnico autorTecnico;
 
     public Comentario() {
@@ -37,7 +45,6 @@ public class Comentario {
         this.chamado = chamado;
         this.autorUsuario = autorUsuario;
         this.autorTecnico = autorTecnico;
-        this.dataCriacao = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -56,12 +63,20 @@ public class Comentario {
         this.texto = texto;
     }
 
-    public LocalDateTime getDataCriacao() {
-        return dataCriacao;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setDataCriacao(LocalDateTime dataCriacao) {
-        this.dataCriacao = dataCriacao;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public Chamado getChamado() {

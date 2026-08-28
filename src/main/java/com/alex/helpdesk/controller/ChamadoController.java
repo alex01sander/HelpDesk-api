@@ -6,9 +6,9 @@ import com.alex.helpdesk.dto.ChamadoRequestDTO;
 import com.alex.helpdesk.dto.ChamadoResponseDTO;
 import com.alex.helpdesk.service.ChamadoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/chamados")
@@ -26,8 +26,8 @@ public class ChamadoController {
     }
 
     @GetMapping
-    public List<ChamadoResponseDTO> listarChamados() {
-        return chamadoService.listarChamados();
+    public Page<ChamadoResponseDTO> listarChamados(Pageable pageable) {
+        return chamadoService.listarChamados(pageable);
     }
 
     @GetMapping("/{id}")

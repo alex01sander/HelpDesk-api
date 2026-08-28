@@ -10,6 +10,7 @@ import com.alex.helpdesk.repository.ComentarioRepository;
 import com.alex.helpdesk.repository.TecnicoRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class TecnicoService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public TecnicoResponseDTO cadastrarTecnico(TecnicoRequestDTO dto) {
         Tecnico tecnico = new Tecnico(dto);
         tecnico.setSenha(passwordEncoder.encode(dto.senha()));
@@ -52,6 +54,7 @@ public class TecnicoService {
         return converterParaDTO(tecnico);
     }
 
+    @Transactional
     public TecnicoResponseDTO atualizarTecnico(Long id, TecnicoRequestDTO dto) {
         Tecnico tecnico = tecnicoRepository.findById(id)
                 .orElseThrow(() -> new TecnicoNaoEncontradoException(id));
@@ -66,6 +69,7 @@ public class TecnicoService {
         return converterParaDTO(tecnicoAtualizado);
     }
 
+    @Transactional
     public void excluirTecnico(Long id) {
         Tecnico tecnico = tecnicoRepository.findById(id)
                 .orElseThrow(() -> new TecnicoNaoEncontradoException(id));

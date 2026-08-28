@@ -5,4 +5,8 @@ public class TecnicoNaoEncontradoException extends RuntimeException {
     public TecnicoNaoEncontradoException(Long id) {
         super("Técnico não encontrado com o id: " + id);
     }
+
+    public TecnicoNaoEncontradoException(String email) {
+        super("Técnico não encontrado com o email: " + email);
+    }
 }
